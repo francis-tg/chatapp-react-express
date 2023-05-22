@@ -29,10 +29,6 @@ function Chat() {
   const [activeUser, setActiveUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [Mine, setMine] = useState({});
-  const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState(null);
-  const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
   const msgBox = useSelector((state) => state.chatReduce.chat.msgBox)
   const dispatch = useDispatch()
   const handleSendMessage = () => {
@@ -68,46 +64,7 @@ function Chat() {
       });
     }
   };
-  const handleStartRecording = () => {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream) => {
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
-
-        mediaRecorder.addEventListener('dataavailable', (event) => {
-          chunksRef.current.push(event.data);
-        });
-
-        mediaRecorder.addEventListener('stop', () => {
-          const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
-          setAudioBlob(audioBlob);
-          chunksRef.current = [];
-        });
-
-        mediaRecorder.start();
-        setRecording(true);
-      })
-      .catch((error) => {
-        console.error('Error accessing microphone:', error);
-      });
-  };
-
-  const handleStopRecording = () => {
-    const mediaRecorder = mediaRecorderRef.current;
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      setRecording(false);
-    }
-  };
-
-  const handleSendAudio = () => {
-    // Implement logic to send audio blob to server or other recipients
-    // Replace with your own implementation
-
-    // Reset audio blob
-    //setAudioBlob(null);
-    handleStartRecording()
-  };
+  
 
   const handleSetActiveUser = user => {
     setActiveUser(user);
@@ -264,7 +221,6 @@ function Chat() {
                     {" "}{message.message}{" "}
                   </Text>
                   {/* {Mine._id ===message.outgoing_id?<Icon as={FaCheckDouble} size={5} position="absolute" right={0}/>:<Icon as={FaCheckDouble} size={5} position="absolute" left={0}/>} */}
-                  {console.log(message)}
                 </Box>
                 {Mine._id === message.outgoing_id._id &&
                   <Avatar size="sm" src={message.outgoing_id.image} mr={2} />}
@@ -272,7 +228,7 @@ function Chat() {
             )}
         </VStack>
         <Flex mt={4} position="absolute" alignItems="center" bottom="25px" p="10px" width="100%">
-          <Button background="transparent" onClick={handleSendAudio}>
+          <Button background="transparent" onClick={()=>{}}>
             <FaMicrophone  />
           </Button>
           <Input
