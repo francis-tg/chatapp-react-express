@@ -4,12 +4,12 @@ export const chatSlice = createSlice({
     name:"chat",
   initialState: {
     chat: {
-      msgBox:true
+      msgBox:false
   }
   },
   reducers: {
-      toUserList: (state, paylaod) => {
-          return state.chat.msgBox = false
+      toUserList: (state, action) => {
+       state.chat.msgBox = action.payload
     }
   },
 })

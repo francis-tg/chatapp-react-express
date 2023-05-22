@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Chat from './components/Chat';
 import Login from './pages/Login';
 import RegisterPage from './pages/Register';
+import PrivateRoute from './components/PrivateRouter';
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
         <Navbar />
         <Box mt={0} p={5}>
           <Routes>
-            <Route  path="/" element={<Chat/>} />
+            <Route path="/" element={<PrivateRoute/>}>
+              <Route path='/' element={<Chat/>}/>
+            </Route>
             {/* Add more routes for different pages */}
             <Route path='/login' element={<Login/>}/>
             <Route path='/register' element={<RegisterPage/>}/>

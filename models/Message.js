@@ -3,11 +3,13 @@ const mongoose = require("mongoose")
 const MessageSchema = new mongoose.Schema({
     incoming_id: {
         type: mongoose.Schema.Types.ObjectId,
-        require:true
+        require: true,
+         ref:"User"
     },
     outgoing_id: {
         type: mongoose.Schema.Types.ObjectId,
-        require:true
+        require: true,
+        ref:"User"
     },
     message: {
         type: String,
