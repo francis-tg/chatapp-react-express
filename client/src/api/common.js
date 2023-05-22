@@ -1,1 +1,1 @@
-export const API_URL = process.env.NODE_ENV ==="production"?"https://africa-chat.onrender.com:8000":`${window.location.protocol}//${window.location.hostname}:8000/api`
+export const API_URL = process.env.NODE_ENV ==="production"?"https://africa-chat.onrender.com":`${window.location.protocol}//${window.location.hostname}:8000/api`
