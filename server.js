@@ -35,6 +35,7 @@ io.on("connection", (socket) => {
     console.log('user connect')
 })
 app.io = io
+const PORT = process.env.NODE_ENV ==="production"?8000:process.env.PORT ||80
 server.listen(8000, () => {
     console.log("run on port 8000")
 })
