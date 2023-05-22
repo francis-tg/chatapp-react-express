@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Box,
   Input,
@@ -14,6 +14,8 @@ import {
   //Icon,
 } from "@chakra-ui/react";
 import {
+  FaImage,
+  FaMicrophone,
   // FaCheckDouble,
   FaPaperPlane,
 } from "react-icons/fa";
@@ -27,6 +29,10 @@ function Chat() {
   const [activeUser, setActiveUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [Mine, setMine] = useState({});
+  const [recording, setRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
   const msgBox = useSelector((state) => state.chatReduce.chat.msgBox)
   const dispatch = useDispatch()
   const handleSendMessage = () => {
@@ -49,7 +55,7 @@ function Chat() {
         }),
       }).then(async res => {
         setNewMessage("");
-        await fetch(`${API_URL}/message/${activeUser}`, {
+        await fetch(`${API_URL}/message/${activeUser._id}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -62,11 +68,51 @@ function Chat() {
       });
     }
   };
+  const handleStartRecording = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.addEventListener('dataavailable', (event) => {
+          chunksRef.current.push(event.data);
+        });
+
+        mediaRecorder.addEventListener('stop', () => {
+          const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
+          setAudioBlob(audioBlob);
+          chunksRef.current = [];
+        });
+
+        mediaRecorder.start();
+        setRecording(true);
+      })
+      .catch((error) => {
+        console.error('Error accessing microphone:', error);
+      });
+  };
+
+  const handleStopRecording = () => {
+    const mediaRecorder = mediaRecorderRef.current;
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      setRecording(false);
+    }
+  };
+
+  const handleSendAudio = () => {
+    // Implement logic to send audio blob to server or other recipients
+    // Replace with your own implementation
+
+    // Reset audio blob
+    //setAudioBlob(null);
+    handleStartRecording()
+  };
 
   const handleSetActiveUser = user => {
     setActiveUser(user);
     
-    fetch(`${API_URL}/message/${user}`, {
+    fetch(`${API_URL}/message/${user._id}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -148,7 +194,7 @@ function Chat() {
               borderRadius="md"
               cursor="pointer"
               _hover={{bg: "teal.200"}}
-              onClick={() => handleSetActiveUser(user._id)}
+              onClick={() => handleSetActiveUser(user)}
             >
               <Flex alignItems="center">
                 <Avatar size="sm" src={user.image} mr={2}>
@@ -165,7 +211,7 @@ function Chat() {
       <Box
         bg="white"
         boxShadow="md"
-        display={{base: activeUser ? "block" : "none", md: "block"}}
+        display={{base: msgBox ? "block" : "none", md: "block"}}
         position="relative"
         p="5px"
         height="95vh"
@@ -225,25 +271,33 @@ function Chat() {
               </Flex>
             )}
         </VStack>
-        <Flex mt={4} position="absolute" bottom="25px" p="8px" width="100%">
+        <Flex mt={4} position="absolute" alignItems="center" bottom="25px" p="10px" width="100%">
+          <Button background="transparent" onClick={handleSendAudio}>
+            <FaMicrophone  />
+          </Button>
           <Input
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            placeholder="Type your message"
+            placeholder={`Fait un coucou à ${!activeUser||activeUser.username}`}
             borderRadius="md"
             bg="white"
             boxShadow="md"
             flex="1"
             mr={2}
           />
+          <Button background="transparent" >
+            <FaImage  />
+          </Button>
           <Button
             onClick={handleSendMessage}
             colorScheme="teal"
             borderRadius="md"
             _hover={{bg: "teal.500"}}
           >
+           
             <FaPaperPlane />
           </Button>
+          
         </Flex>
       </Box>
     </Grid>
