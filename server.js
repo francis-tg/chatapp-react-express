@@ -40,8 +40,7 @@ app.get("/", (req, res) => {
   res.send("i am ok");
 });
 app.io = io;
-const PORT =
-  process.env.NODE_ENV === "production" ? 80 : process.env.PORT || 8000;
+const PORT = 80;
 server.listen(PORT, () => {
   console.log("run on port " + PORT);
 });
