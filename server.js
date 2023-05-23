@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 });
 app.io = io;
 const PORT =
-  process.env.NODE_ENV === "production" ? 8000 : process.env.PORT || 80;
+  process.env.NODE_ENV === "production" ? 80 : process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log("run on port " + PORT);
 });
